@@ -4,7 +4,7 @@ import requests
 
 app = Flask(__name__)
 
-# Tumhara Green light wala Space URL
+# Ekdum sahi URL
 HF_BRAIN_URL = "https://lalubhai-rex.hf.space/ask" 
 
 @app.route('/')
@@ -15,12 +15,18 @@ def index():
 def send_message():
     user_text = request.json.get("message")
     try:
-        # Timeout 60 second rakha hai taaki browser load ho sake
-        response = requests.post(HF_BRAIN_URL, json={"message": user_text}, timeout=120)
+        # Hugging Face ko batana padta hai ki hum JSON bhej rahe hain
+        response = requests.post(
+            HF_BRAIN_URL, 
+            json={"message": user_text}, 
+            headers={"Content-Type": "application/json"},
+            timeout=120
+        )
         return jsonify(response.json())
     except Exception as e:
-        return jsonify({"reply": f"REX ke dimaag se sampark nahi ho paya. Error: {str(e)}"}), 500
+        print(f"ERROR: {str(e)}") # Ye Render ke logs mein dikhega
+        return jsonify({"reply": "REX ka dimaag offline hai ya network issue hai."}), 500
 
 if __name__ == "__main__":
+    # Render ke liye port 10000 sahi hai
     app.run(host='0.0.0.0', port=10000)
-    
