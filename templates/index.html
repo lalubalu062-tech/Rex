@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>REX AI - Controller</title>
+    <style>
+        body { background: #0d1117; color: #c9d1d9; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; line-height: 1.4; }
+        .user { background: #238636; align-self: flex-end; color: white; }
+        .rex { background: #21262d; align-self: flex-start; border: 1px solid #30363d; }
+        .input-area { padding: 20px; background: #161b22; display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; border-radius: 5px; border: 1px solid #30363d; background: #0d1117; color: white; }
+        button { padding: 10px 20px; background: #238636; border: none; color: white; border-radius: 5px; cursor: pointer; }
+        img { max-width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #58a6ff; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center; color:#58a6ff;">🚀 REX AI SYSTEM</h2>
+    <div id="chat-box"></div>
+    <div class="input-area">
+        <input type="text" id="msgInput" placeholder="REX ko command do...">
+        <button onclick="send()">BHEJO</button>
+    </div>
+
+    <script>
+        async function send() {
+            const input = document.getElementById('msgInput');
+            const box = document.getElementById('chat-box');
+            if(!input.value) return;
+
+            // User message dikhao
+            box.innerHTML += `<div class="msg user">${input.value}</div>`;
+            const userMsg = input.value;
+            input.value = '';
+
+            // Loading dikhao
+            const loadingId = "load-" + Date.now();
+            box.innerHTML += `<div class="msg rex" id="${loadingId}">REX soch raha hai...</div>`;
+            box.scrollTop = box.scrollHeight;
+
+            // API Call
+            const res = await fetch('/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: userMsg})
+            });
+            const data = await res.json();
+            
+            // Response dikhao
+            const loadElem = document.getElementById(loadingId);
+            loadElem.innerHTML = data.reply;
+            if(data.image) {
+                loadElem.innerHTML += `<br><a href="${data.image}" target="_blank"><img src="${data.image}"></a>`;
+            }
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>
