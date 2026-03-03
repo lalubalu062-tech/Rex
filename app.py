@@ -1,11 +1,11 @@
+import os
 from flask import Flask, render_template, request, jsonify
 import requests
 
 app = Flask(__name__)
 
-# Tumhare Hugging Face Space ka API URL
-# Example: https://lalubhai-rex-logic.hf.space/ask
-HF_BRAIN_URL = "https://YOUR_USERNAME-YOUR_SPACE_NAME.hf.space/ask"
+# Tumhara Green light wala Space URL
+HF_BRAIN_URL = "https://lalubhai-rex.hf.space/ask" 
 
 @app.route('/')
 def index():
@@ -14,9 +14,13 @@ def index():
 @app.route('/send', methods=['POST'])
 def send_message():
     user_text = request.json.get("message")
-    # Brain (HF) ko message bhej rahe hain
-    response = requests.post(HF_BRAIN_URL, json={"message": user_text})
-    return jsonify(response.json())
+    try:
+        # Timeout 60 second rakha hai taaki browser load ho sake
+        response = requests.post(HF_BRAIN_URL, json={"message": user_text}, timeout=120)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({"reply": f"REX ke dimaag se sampark nahi ho paya. Error: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=10000)
+    
